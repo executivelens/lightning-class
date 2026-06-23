@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Case Study — How to win when your boss doesn't like you</title>
+<style>
+/* ============ Light (Apple-Clean) tokens ============ */
+:root{
+    --paper:#fff; --ink:#1d1d1f;
+    --bg-primary:#fff; --text-primary:#1d1d1f; --text-secondary:#6e6e73;
+    --accent:#0071e3; --accent-dim:rgba(0,113,227,.10);
+    --border:#d2d2d7; --surface:#f5f5f7; --on-accent:#fff;
+    --pos:#0071e3; --neg:#86868b;
+    --font-title:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Neue',Arial,sans-serif;
+    --font-body:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Neue',Arial,sans-serif;
+    --slide-padding: clamp(2rem, 6vw, 5rem);
+    --content-gap: clamp(0.75rem, 2vw, 1.5rem);
+}
+h1,h2{font-weight:700;letter-spacing:-.025em} .cover h1,.closing h1{letter-spacing:-.03em}
+
+/* ============ Base ============ */
+*,*::before,*::after{ margin:0; padding:0; box-sizing:border-box; }
+html{ height:100%; scroll-snap-type:y mandatory; scroll-behavior:smooth; overflow-x:hidden; }
+body{ height:100%; font-family:var(--font-body); background:var(--bg-primary); color:var(--text-primary); overflow-x:hidden; }
+.slide{ width:100vw; height:100vh; height:100dvh; overflow:hidden; scroll-snap-align:start;
+    display:flex; flex-direction:column; justify-content:flex-start; position:relative;
+    padding:var(--slide-padding); padding-top:clamp(3rem,7vh,5rem); }
+.slide.cover,.slide.quote,.slide.closing,.slide.vcenter{ justify-content:center; padding-top:var(--slide-padding); }
+@media (max-height:760px){ :root{ --slide-padding:clamp(1.2rem,4vw,3rem); } .slide{ padding-top:clamp(2rem,5vh,3rem);} }
+@media (max-height:600px){ .nav-dots,.decorative{ display:none; } }
+@media (prefers-reduced-motion:reduce){
+    *,*::before,*::after{ animation-duration:.01ms!important; transition-duration:.2s!important; }
+    html{ scroll-behavior:auto; } .float,.pulse{ animation:none; }
+    .circle-mark path{ stroke-dashoffset:0; } .circle-word::before{ animation:none; opacity:.6; transform:scale(1); }
+    .rt-fill{ transform:scaleX(1)!important; }
+}
+
+/* ============ Animation toolkit ============ */
+.reveal{ opacity:0; transform:translateY(16px); transition:opacity .6s cubic-bezier(.16,1,.3,1),transform .6s cubic-bezier(.16,1,.3,1),filter .6s ease; will-change:opacity,transform; }
+.slide.visible .reveal{ opacity:1; transform:none; filter:none; }
+.reveal.fade-only{ transform:none; } .reveal.from-left{ transform:translateX(-24px); }
+.reveal.from-right{ transform:translateX(24px); } .reveal.from-scale{ transform:scale(.96); }
+.reveal.from-blur{ filter:blur(8px); transform:none; }
+.stagger>*{ opacity:0; transform:translateY(14px); transition:opacity .55s cubic-bezier(.16,1,.3,1),transform .55s cubic-bezier(.16,1,.3,1); }
+.slide.visible .stagger>*{ opacity:1; transform:none; }
+.slide.visible .stagger>*:nth-child(1){ transition-delay:.05s; } .slide.visible .stagger>*:nth-child(2){ transition-delay:.12s; }
+.slide.visible .stagger>*:nth-child(3){ transition-delay:.19s; } .slide.visible .stagger>*:nth-child(4){ transition-delay:.26s; }
+.slide.visible .stagger>*:nth-child(5){ transition-delay:.33s; } .slide.visible .stagger>*:nth-child(6){ transition-delay:.40s; }
+.slide.visible .stagger>*:nth-child(7){ transition-delay:.47s; }
+@keyframes floaty{ 0%,100%{ transform:translateY(0);} 50%{ transform:translateY(-6px);} }
+.float{ animation:floaty 5s ease-in-out infinite; }
+
+/* ============ Shared typography / formats ============ */
+.eyebrow{ display:block; font-size:clamp(.92rem,1.25vw,1.1rem); letter-spacing:.16em; text-transform:uppercase; color:var(--accent); font-weight:700; margin-bottom:.7rem; }
+h1{ font-family:var(--font-title); }
+h2{ font-family:var(--font-title); font-size:clamp(2.4rem,5.4vw,4rem); font-weight:700; line-height:1.05; }
+.lead{ font-size:clamp(1.15rem,1.7vw,1.5rem); color:var(--text-secondary); margin-top:1rem; max-width:46ch; line-height:1.45; }
+.checks{ list-style:none; display:flex; flex-direction:column; gap:.6rem; }
+.checks li{ display:flex; gap:.6rem; align-items:flex-start; font-size:clamp(1.02rem,1.35vw,1.22rem); line-height:1.4; }
+.checks .mk{ color:var(--accent); font-weight:800; flex:0 0 auto; margin-top:.05em; }
+.cols{ display:flex; gap:clamp(1.4rem,3vw,2.6rem); align-items:center; }
+.col-text{ flex:1 1 50%; } .col-media{ flex:1 1 50%; }
+
+/* ============ Cover / closing ============ */
+.cover{ justify-content:center; align-items:flex-start; }
+.cover .aura{ position:absolute; z-index:0; pointer-events:none; width:62vw; height:62vw; left:-12vw; top:50%;
+  background:radial-gradient(circle, color-mix(in srgb, var(--accent) 38%, transparent), color-mix(in srgb, var(--accent) 9%, transparent) 45%, transparent 70%);
+  filter:blur(26px); transform:translateY(-50%); animation:drift 17s ease-in-out infinite; }
+@keyframes drift{ 0%{ transform:translateY(-50%) translateX(-2%) scale(1);} 50%{ transform:translateY(-54%) translateX(4%) scale(1.1);} 100%{ transform:translateY(-50%) translateX(-2%) scale(1);} }
+.cover .inner{ position:relative; z-index:1; max-width:min(94vw,1500px); }
+.cover h1{ color:var(--text-primary); font-size:clamp(3rem,7vw,5.6rem); line-height:1.02; letter-spacing:-.03em; }
+.circle-word{ position:relative; display:inline-block; font-style:italic; color:var(--text-primary); white-space:nowrap; padding:0 .18em; isolation:isolate; }
+.circle-word::before{ content:""; position:absolute; inset:-30% -10%; background:radial-gradient(ellipse at center,color-mix(in srgb,var(--accent) 24%,transparent),transparent 65%); filter:blur(24px); z-index:-2; opacity:0; transform:scale(.94); transition:opacity 1.2s cubic-bezier(.16,1,.3,1) 1.4s,transform 1.2s cubic-bezier(.16,1,.3,1) 1.4s; pointer-events:none; }
+.cover.visible .circle-word::before{ opacity:.7; transform:scale(1); animation:wordGlow 5.4s ease-in-out 2.6s infinite; }
+@keyframes wordGlow{ 0%,100%{ opacity:.45; transform:scale(.96);} 50%{ opacity:.8; transform:scale(1.06);} }
+.circle-mark{ position:absolute; left:-3%; top:-19%; width:106%; height:138%; overflow:visible; pointer-events:none; z-index:-1; }
+.circle-mark path{ fill:none; stroke:var(--accent); stroke-width:5; stroke-linecap:round; stroke-linejoin:round; stroke-dasharray:1100; stroke-dashoffset:1100; transition:stroke-dashoffset 1.5s cubic-bezier(.6,.04,.4,1) 1.1s; }
+.cover.visible .circle-mark path{ stroke-dashoffset:0; }
+.cover .sub{ font-size:clamp(1.3rem,2.4vw,2rem); color:var(--text-secondary); margin-top:clamp(1.4rem,3vh,2.2rem); max-width:40ch; }
+.cover.visible h1{ transition-delay:.05s; } .cover.visible .sub{ transition-delay:.22s; }
+.cta{ display:inline-block; margin-top:clamp(2rem,4vh,2.8rem); background:var(--accent); color:var(--on-accent); font-weight:700; font-size:clamp(1.1rem,1.6vw,1.4rem); padding:.7em 1.4em; border-radius:999px; text-decoration:none; }
+.closing.visible .cta{ transition-delay:.42s; }
+
+/* ============ POV two-column motif ============ */
+.pov{ display:grid; grid-template-columns:1fr 1fr; gap:clamp(1.2rem,2.4vw,2rem); margin-top:clamp(1.6rem,4vh,2.6rem); align-items:stretch; }
+.pov.single{ grid-template-columns:1fr; max-width:920px; }
+.povcard{ background:#fff; border:1px solid var(--border); border-radius:18px; padding:clamp(1.4rem,2.4vw,2rem); box-shadow:0 12px 30px rgba(0,0,0,.05); display:flex; flex-direction:column; }
+.povcard.accent{ border-color:color-mix(in srgb,var(--accent) 45%,var(--border)); box-shadow:0 16px 36px rgba(0,113,227,.10); }
+.ptag{ display:inline-block; align-self:flex-start; font-size:clamp(.78rem,1vw,.92rem); letter-spacing:.1em; text-transform:uppercase; font-weight:700; padding:.35em .8em; border-radius:999px; margin-bottom:1.1rem; }
+.ptag.mgr{ color:var(--text-secondary); background:var(--surface); }
+.ptag.dr{ color:var(--accent); background:var(--accent-dim); }
+.ptag.neg{ color:var(--neg); background:var(--surface); }
+.ptag.pos{ color:var(--accent); background:var(--accent-dim); }
+.povcard h3{ font-size:clamp(1.25rem,1.9vw,1.6rem); font-weight:700; margin-bottom:.7rem; letter-spacing:-.01em; }
+.povcard p{ font-size:clamp(1.05rem,1.4vw,1.28rem); color:var(--text-primary); line-height:1.5; }
+.povcard p+p{ margin-top:.7rem; }
+.povcard .muted{ color:var(--text-secondary); }
+.povcard .checks{ margin-top:.2rem; }
+.mk.no{ color:var(--neg); }
+
+/* ============ Feature grid ============ */
+.grid{ display:grid; grid-template-columns:repeat(2,1fr); gap:clamp(1rem,1.8vw,1.5rem); margin-top:clamp(1.6rem,4vh,2.6rem); }
+.grid.g4{ grid-template-columns:repeat(4,1fr); }
+.card{ background:#fff; border:1px solid var(--border); border-radius:18px; padding:clamp(1.3rem,2.2vw,1.9rem); display:flex; flex-direction:column; box-shadow:0 12px 30px rgba(0,0,0,.05); }
+.cardic{ display:grid; place-items:center; width:clamp(46px,4vw,60px); height:clamp(46px,4vw,60px); border-radius:14px; background:var(--accent-dim); margin-bottom:.9rem; font-weight:800; color:var(--accent); font-size:clamp(1.1rem,1.5vw,1.35rem); }
+.card h3{ font-size:clamp(1.2rem,1.8vw,1.55rem); font-weight:700; margin-bottom:.3rem; letter-spacing:-.01em; }
+.card p{ font-size:clamp(1rem,1.3vw,1.18rem); color:var(--text-secondary); line-height:1.42; }
+
+/* ============ Numbers bento ============ */
+.nums{ display:grid; grid-template-columns:repeat(4,1fr); gap:clamp(.9rem,1.6vw,1.4rem); margin-top:clamp(1.6rem,4vh,2.6rem); }
+.numcard{ background:#fff; border:1px solid var(--border); border-radius:16px; padding:clamp(1.1rem,2vw,1.6rem); box-shadow:0 10px 26px rgba(0,0,0,.05); }
+.numcard.wide{ grid-column:span 2; }
+.numbig{ font-family:var(--font-title); font-weight:700; color:var(--accent); font-size:clamp(2.4rem,4.6vw,3.6rem); line-height:.9; letter-spacing:-.03em; }
+.numbig .u{ font-size:.46em; font-weight:700; }
+.numlab{ font-weight:700; font-size:clamp(1.02rem,1.4vw,1.22rem); margin-top:.7rem; }
+.numctx{ font-size:clamp(.92rem,1.2vw,1.08rem); color:var(--text-secondary); margin-top:.25rem; line-height:1.35; }
+
+/* ============ Timeline (6 nodes) ============ */
+.rt{ position:relative; margin-top:clamp(3rem,9vh,6rem); padding:0 clamp(1%,2vw,3%); }
+.rt-track{ position:absolute; left:clamp(1%,2vw,3%); right:clamp(1%,2vw,3%); top:18px; height:2px; background:var(--border); }
+.rt-fill{ position:absolute; left:clamp(1%,2vw,3%); width:88%; top:18px; height:2px; background:var(--accent); transform-origin:left; transform:scaleX(0); }
+.slide.visible .rt-fill{ animation:rtFill 1.2s cubic-bezier(.16,1,.3,1) .9s forwards; }
+@keyframes rtFill{ from{ transform:scaleX(0);} to{ transform:scaleX(1);} }
+.rt-grid{ position:relative; display:grid; grid-template-columns:repeat(6,1fr); gap:clamp(.6rem,1.4vw,1.2rem); }
+.rt-step{ display:flex; flex-direction:column; align-items:flex-start; text-align:left; }
+.rt-dot{ width:14px; height:14px; border-radius:50%; background:var(--accent); border:4px solid var(--bg-primary); box-shadow:0 0 0 2px var(--accent); position:relative; z-index:1; margin-left:2px; }
+.rt-date{ font-weight:800; font-size:clamp(1rem,1.4vw,1.25rem); margin-top:clamp(1rem,2vh,1.5rem); letter-spacing:-.01em; }
+.rt-desc{ font-size:clamp(.92rem,1.15vw,1.08rem); color:var(--text-secondary); line-height:1.4; margin-top:.4rem; }
+
+/* ============ Cast cards ============ */
+.cast{ display:grid; grid-template-columns:1fr 1fr; gap:clamp(1.4rem,3vw,2.4rem); margin-top:clamp(1.8rem,4.5vh,3rem); }
+.castcard{ background:#fff; border:1px solid var(--border); border-radius:20px; padding:clamp(1.6rem,2.8vw,2.4rem); box-shadow:0 14px 34px rgba(0,0,0,.06); display:flex; gap:clamp(1.1rem,2vw,1.6rem); align-items:center; }
+.avatar{ flex:0 0 auto; width:clamp(70px,7vw,104px); height:clamp(70px,7vw,104px); border-radius:50%; display:grid; place-items:center; font-weight:800; font-size:clamp(1.5rem,2.4vw,2.2rem); color:var(--on-accent); background:var(--accent); }
+.castcard.alt .avatar{ background:var(--ink); }
+.castcard h3{ font-size:clamp(1.4rem,2vw,1.85rem); font-weight:700; letter-spacing:-.01em; }
+.castcard .role{ color:var(--accent); font-weight:700; font-size:clamp(1rem,1.3vw,1.18rem); margin-top:.2rem; }
+.castcard .note{ color:var(--text-secondary); font-size:clamp(1rem,1.3vw,1.18rem); margin-top:.55rem; line-height:1.4; }
+
+/* ============ Quote / hard-truth ============ */
+.quote .qmark{ font-family:var(--font-title); font-size:clamp(4rem,10vw,8rem); line-height:.4; color:var(--accent); display:block; height:.5em; }
+.quote blockquote{ font-family:var(--font-title); font-size:clamp(2rem,4.4vw,3.6rem); line-height:1.14; max-width:22ch; border:0; margin:0; font-weight:700; letter-spacing:-.02em; }
+.quote .qbody{ font-size:clamp(1.2rem,1.8vw,1.5rem); color:var(--text-secondary); margin-top:1.6rem; max-width:50ch; line-height:1.5; }
+.accentword{ color:var(--accent); }
+
+/* ============ Course card ============ */
+.coursecard{ background:#fff; border:1px solid var(--border); border-radius:20px; padding:clamp(1.6rem,2.8vw,2.3rem); box-shadow:0 18px 44px rgba(0,0,0,.08); }
+.coursecard .ctitle{ font-family:var(--font-title); font-size:clamp(1.5rem,2.3vw,2rem); font-weight:700; line-height:1.15; letter-spacing:-.01em; }
+.coursecard .cby{ color:var(--text-secondary); font-weight:600; font-size:clamp(1rem,1.3vw,1.18rem); margin-top:.9rem; }
+.coursecard .stars{ color:var(--accent); font-weight:800; font-size:clamp(1.05rem,1.4vw,1.25rem); margin-top:1.1rem; }
+.coursecard .stars span{ color:var(--text-secondary); font-weight:600; }
+.coursecard .pill{ display:inline-block; margin-top:1.1rem; background:var(--accent-dim); color:var(--accent); font-weight:700; padding:.4em .9em; border-radius:999px; font-size:clamp(.95rem,1.2vw,1.1rem); }
+
+/* ============ Alumni + testimonial ============ */
+.alumni{ display:flex; flex-wrap:wrap; gap:.6rem; align-content:flex-start; }
+.chip{ background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:.5em .85em; font-weight:700; font-size:clamp(.92rem,1.15vw,1.05rem); color:var(--text-primary); }
+.tcard{ background:#fff; border:1px solid var(--border); border-radius:20px; padding:clamp(1.6rem,2.8vw,2.4rem); box-shadow:0 18px 44px rgba(0,0,0,.07); }
+.tcard .tstars{ color:var(--accent); font-size:clamp(1.05rem,1.4vw,1.25rem); letter-spacing:.05em; }
+.tcard blockquote{ font-family:var(--font-title); font-size:clamp(1.3rem,1.9vw,1.7rem); line-height:1.35; margin:1rem 0 0; border:0; font-weight:600; }
+.tcard .tby{ margin-top:1.3rem; font-weight:700; font-size:clamp(1rem,1.3vw,1.15rem); }
+.tcard .tby span{ color:var(--text-secondary); font-weight:600; }
+
+/* ============ Cohort cards ============ */
+.cohorts{ display:grid; grid-template-columns:1fr 1fr; gap:clamp(1rem,2vw,1.6rem); max-width:760px; }
+.cohort{ background:#fff; border:1px solid var(--border); border-radius:18px; padding:clamp(1.4rem,2.4vw,2rem); box-shadow:0 12px 30px rgba(0,0,0,.06); }
+.cohort .cd{ font-family:var(--font-title); font-weight:700; font-size:clamp(1.8rem,3vw,2.6rem); color:var(--accent); letter-spacing:-.02em; }
+.cohort .cn{ color:var(--text-secondary); font-weight:600; font-size:clamp(1rem,1.3vw,1.15rem); margin-top:.4rem; }
+
+/* ============ Live poll ============ */
+.live-dot{ display:inline-block; width:.62em; height:.62em; border-radius:50%; background:var(--accent); margin:0 .4em 0 .55em; vertical-align:middle; animation:livePulse 1.6s ease-in-out infinite; }
+@keyframes livePulse{ 0%,100%{ opacity:1; transform:scale(1);} 50%{ opacity:.3; transform:scale(.8);} }
+.poll{ margin-top:clamp(1.6rem,4vh,2.6rem); display:flex; flex-direction:column; gap:clamp(.85rem,2vh,1.4rem); max-width:1000px; }
+.poll-head{ display:flex; justify-content:space-between; align-items:baseline; margin-bottom:.4rem; gap:1rem; }
+.poll-opt{ font-weight:700; font-size:clamp(1.08rem,1.55vw,1.4rem); }
+.poll-pct{ font-family:var(--font-title); font-weight:700; color:var(--accent); font-size:clamp(1.2rem,1.8vw,1.6rem); font-variant-numeric:tabular-nums; white-space:nowrap; }
+.poll-pct .n{ color:var(--text-secondary); font-size:.62em; font-weight:600; margin-left:.4em; }
+.poll-track{ height:clamp(15px,2.3vh,24px); background:var(--surface); border:1px solid var(--border); border-radius:999px; overflow:hidden; }
+.poll-fill{ height:100%; width:0; background:var(--accent); border-radius:999px; transition:width .9s cubic-bezier(.16,1,.3,1); }
+.poll-row:nth-child(2) .poll-fill{ background:color-mix(in srgb,var(--accent) 78%, #fff); }
+.poll-row:nth-child(3) .poll-fill{ background:color-mix(in srgb,var(--accent) 56%, #fff); }
+.poll-row:nth-child(4) .poll-fill{ background:color-mix(in srgb,var(--accent) 42%, #fff); }
+.poll-foot{ margin-top:clamp(1.3rem,3vh,2rem); color:var(--text-secondary); font-weight:600; font-size:clamp(1rem,1.3vw,1.18rem); }
+.poll-foot b{ color:var(--text-primary); font-variant-numeric:tabular-nums; }
+.poll-wait{ color:var(--text-secondary); font-weight:600; font-size:clamp(1.05rem,1.4vw,1.25rem); padding:.4rem 0; }
+
+.foot{ position:absolute; left:var(--slide-padding); bottom:clamp(1rem,2.4vh,1.8rem); font-size:clamp(.8rem,1vw,.95rem); color:var(--text-secondary); }
+
+@media (max-width:900px){
+    .pov,.cast,.cohorts{ grid-template-columns:1fr; }
+    .grid.g4{ grid-template-columns:repeat(2,1fr); }
+    .nums{ grid-template-columns:repeat(2,1fr); }
+    .rt-grid{ grid-template-columns:repeat(3,1fr); row-gap:1.8rem; } .rt-track,.rt-fill{ display:none; }
+    .cols{ flex-direction:column; align-items:stretch; }
+}
+</style>
+</head>
+<body>
+
+<!-- 1. COVER -->
+<section class="slide cover">
+  <div class="aura"></div>
+  <div class="inner">
+    <span class="eyebrow reveal">Executive Lens Production · Case Study</span>
+    <h1 class="reveal from-blur">How to win when your boss <span class="circle-word">doesn't like you<svg class="circle-mark" viewBox="0 0 400 130" preserveAspectRatio="none" aria-hidden="true"><path d="M 364 32 C 286 4, 78 6, 22 34 C -22 60, -4 104, 92 118 C 240 134, 380 118, 392 80 C 402 48, 386 38, 364 32"/></svg></span></h1>
+    <p class="sub reveal">A true story told from both sides of the table — with Mengxi Li &amp; Amanda Tobin.</p>
+  </div>
+</section>
+
+<!-- 2. THE CAST -->
+<section class="slide vcenter">
+  <span class="eyebrow reveal">The cast</span>
+  <h2 class="reveal">Two people. Two perspectives.</h2>
+  <div class="cast stagger">
+    <div class="castcard">
+      <div class="avatar">ML</div>
+      <div>
+        <h3>Mengxi Li</h3>
+        <div class="role">The boss</div>
+        <div class="note">Ex-Amazon General Manager / Director.</div>
+      </div>
+    </div>
+    <div class="castcard alt">
+      <div class="avatar">AT</div>
+      <div>
+        <h3>Amanda Tobin</h3>
+        <div class="role">The direct report</div>
+        <div class="note">Principal Product Manager at Everbridge.</div>
+      </div>
+    </div>
+  </div>
+  <div class="foot">All materials © Executive Lens Production, LLC 2025. All rights reserved.</div>
+</section>
+
+<!-- 3. TIMELINE -->
+<section class="slide vcenter">
+  <span class="eyebrow reveal">Introduction</span>
+  <h2 class="reveal">A rocky road.</h2>
+  <div class="rt reveal">
+    <div class="rt-track"></div><div class="rt-fill"></div>
+    <div class="rt-grid stagger">
+      <div class="rt-step"><span class="rt-dot"></span><div class="rt-date">Q3 2021</div><div class="rt-desc">Reorg — Amanda's team merges into Mengxi's org; she reports directly to Mengxi.</div></div>
+      <div class="rt-step"><span class="rt-dot"></span><div class="rt-date">Q1 2022</div><div class="rt-desc">Mengxi moves Amanda from a direct report to a skip-level report.</div></div>
+      <div class="rt-step"><span class="rt-dot"></span><div class="rt-date">Q3 2022</div><div class="rt-desc">Amanda promoted to Sr. Manager — still a skip-level report.</div></div>
+      <div class="rt-step"><span class="rt-dot"></span><div class="rt-date">Q1 2023</div><div class="rt-desc">Mengxi promoted to GM/Director; Amanda becomes a direct report again.</div></div>
+      <div class="rt-step"><span class="rt-dot"></span><div class="rt-date">2024</div><div class="rt-desc">Amanda promotes two Sr. Managers and leads global scope — 160+ employees.</div></div>
+      <div class="rt-step"><span class="rt-dot"></span><div class="rt-date">2025</div><div class="rt-desc">Mengxi starts her company and partners with Amanda.</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- 4. DIAGNOSE — TWO POVs -->
+<section class="slide vcenter">
+  <span class="eyebrow reveal">Stage 1 · Diagnose</span>
+  <h2 class="reveal">Diagnosing the friction.</h2>
+  <div class="pov stagger">
+    <div class="povcard">
+      <span class="ptag mgr">Manager's POV</span>
+      <p>"She has raw talent — she just needs a little more time before taking on bigger scope."</p>
+      <p class="muted">"And more polish communicating with a broad audience."</p>
+    </div>
+    <div class="povcard accent">
+      <span class="ptag dr">Direct Report's POV</span>
+      <p>"I was moved from a direct report to a skip-level report. It doesn't seem like my boss trusts me."</p>
+    </div>
+  </div>
+</section>
+
+<!-- 5. DIAGNOSE — STEPS -->
+<section class="slide">
+  <span class="eyebrow reveal">Stage 1 · Diagnose</span>
+  <h2 class="reveal">Understand and embrace the issue.</h2>
+  <p class="lead reveal">The longest, hardest step — done with radical honesty.</p>
+  <div class="grid stagger">
+    <div class="card"><span class="cardic">1</span><h3>Radical objectivity</h3><p>Audit the feedback. Separate the "tone" from the "text." Even if the delivery is harsh, is there a kernel of truth?</p></div>
+    <div class="card"><span class="cardic">2</span><h3>The mirror test</h3><p>Ask: "Am I inadvertently triggering them?" — being too informal, oversharing, or missing small deadlines.</p></div>
+    <div class="card"><span class="cardic">3</span><h3>Learn from others</h3><p>Observe peers who earned your boss's trust — and exactly how they communicate.</p></div>
+    <div class="card"><span class="cardic">4</span><h3>The "user manual" talk</h3><p>A direct, non-emotional ask: "What is the one thing I could change to make your job easier?"</p></div>
+  </div>
+</section>
+
+<!-- 6. TRUST — DOESN'T WORK vs WORKED -->
+<section class="slide vcenter">
+  <span class="eyebrow reveal">Stage 2 · Rebuild trust</span>
+  <h2 class="reveal">Neutralize the distrust.</h2>
+  <p class="lead reveal">Priority #1: make my boss stop <em>distrusting</em> me.</p>
+  <div class="pov stagger">
+    <div class="povcard">
+      <span class="ptag neg">What doesn't work</span>
+      <ul class="checks">
+        <li><span class="mk no">✗</span>Venting to coworkers — it gets back to the boss.</li>
+        <li><span class="mk no">✗</span>Making it personal — an emotional battle is already lost.</li>
+        <li><span class="mk no">✗</span>Trying to change their personality instead of your reaction.</li>
+      </ul>
+    </div>
+    <div class="povcard accent">
+      <span class="ptag pos">What worked</span>
+      <ul class="checks">
+        <li><span class="mk">✓</span>Learn the boss's "currency" — data, speed, or loyalty (all three, for Mengxi). Deliver what makes them look good.</li>
+        <li><span class="mk">✓</span>Over-communicate — proactive updates before they're asked for.</li>
+        <li><span class="mk">✓</span>Keep a "Win Log" — document contributions and positive feedback.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- 7. TRUST — RESULT -->
+<section class="slide quote vcenter">
+  <span class="eyebrow reveal">Stage 2 · The result</span>
+  <div class="reveal from-left">
+    <blockquote>We started speaking the <span class="accentword">same language</span> — data &amp; speed.</blockquote>
+    <p class="qbody">She proved herself reliable through proactive communication, and became far more open to my feedback. <span style="color:var(--text-secondary)">— Manager's POV</span></p>
+  </div>
+</section>
+
+<!-- 8. PARTNERSHIP — FOUNDATION -->
+<section class="slide vcenter">
+  <span class="eyebrow reveal">Stage 3 · Build the partnership</span>
+  <h2 class="reveal">Foundation.</h2>
+  <div class="pov stagger">
+    <div class="povcard accent">
+      <span class="ptag dr">The mindset shift</span>
+      <ul class="checks">
+        <li><span class="mk">→</span>Stopped trying to be liked; focused on being <strong>resourceful</strong>.</li>
+        <li><span class="mk">→</span>Goal shifted from "proving myself" to making my boss's job easier and more predictable.</li>
+        <li><span class="mk">→</span>Earned trust through my team and partner teams — not just self-promotion.</li>
+      </ul>
+    </div>
+    <div class="povcard">
+      <span class="ptag mgr">The steps</span>
+      <ul class="checks">
+        <li><span class="mk">✓</span>Navigate up: "When you were in my position, what strategies did you use?" — then let them talk.</li>
+        <li><span class="mk">✓</span>Sponsorship: which of your boss's peers do you work with — and what's your reputation there?</li>
+        <li><span class="mk">✓</span>Be the anchor: how would your team describe you to your boss?</li>
+        <li><span class="mk">✓</span>Be smart about how you share successes.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- 9. PARTNERSHIP — SCALING -->
+<section class="slide vcenter">
+  <span class="eyebrow reveal">Stage 3 · Scale the partnership</span>
+  <h2 class="reveal">Scaling.</h2>
+  <div class="pov stagger">
+    <div class="povcard accent">
+      <span class="ptag dr">The mindset shift</span>
+      <ul class="checks">
+        <li><span class="mk">→</span>Started thinking one step ahead of my boss.</li>
+        <li><span class="mk">→</span>Flagged risks early, brought options, protected their constraints.</li>
+        <li><span class="mk">→</span>Shifted from <strong>executor</strong> to <strong>thought partner</strong>.</li>
+      </ul>
+    </div>
+    <div class="povcard">
+      <span class="ptag mgr">The steps</span>
+      <ul class="checks">
+        <li><span class="mk">✓</span>Internal marketing: build relationships with peers — your work represents your boss.</li>
+        <li><span class="mk">✓</span>Be your boss's "ambassador": name the common goals, the friction, the "political weather."</li>
+        <li><span class="mk">✓</span>Anticipate downstream effects: "Since we moved the deadline, Finance might flag Q3 spend — concerned?"</li>
+        <li><span class="mk">✓</span>Know your boss's constraints — and protect them.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- 10. THE PAYOFF -->
+<section class="slide vcenter">
+  <span class="eyebrow reveal">The payoff</span>
+  <h2 class="reveal">From executor to thought partner.</h2>
+  <div class="pov single stagger">
+    <div class="povcard accent">
+      <span class="ptag mgr">Manager's POV</span>
+      <ul class="checks">
+        <li><span class="mk">✓</span>A direct-report spot opened — and I moved her back to being my direct report.</li>
+        <li><span class="mk">✓</span>I heard about issues through her first, usually with options already on the table.</li>
+        <li><span class="mk">✓</span>She could foresee problems — whether from people or systems.</li>
+        <li><span class="mk">✓</span>Leverage her strengths for bigger impact → bigger scope and promotion, done consistently.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- 11. WHEN TO WALK AWAY -->
+<section class="slide quote vcenter">
+  <span class="eyebrow reveal">The hard truth</span>
+  <div class="reveal from-left">
+    <span class="qmark">&ldquo;</span>
+    <blockquote>Sometimes <span class="accentword">winning</span> means knowing the situation is unsalvageable.</blockquote>
+    <p class="qbody">Use your documented wins to pivot to a new department or company — on your terms. Learn from your mistakes, and move forward.</p>
+  </div>
+</section>
+
+<!-- 12. WHY THIS COURSE -->
+<section class="slide vcenter">
+  <div class="cols">
+    <div class="col-text reveal from-left">
+      <span class="eyebrow">Why I built this</span>
+      <h2>Take the package. Skip the trial &amp; error.</h2>
+      <ul class="checks" style="margin-top:1.4rem;gap:.8rem">
+        <li><span class="mk">→</span>I struggled with cultural nuances at work early in my career.</li>
+        <li><span class="mk">→</span>Over a decade, I tested approaches &amp; frameworks and kept what works.</li>
+        <li><span class="mk">→</span>So you can implement immediately — instead of 10+ more years of trial and error.</li>
+      </ul>
+    </div>
+    <div class="col-media reveal from-right">
+      <div class="coursecard">
+        <div class="ctitle">Manage Up &amp; Influence Without Authority — frameworks for non-native speakers</div>
+        <div class="cby">Mengxi Li · Ex-Amazon Director / General Manager</div>
+        <div class="stars">★★★★★ 5.0 <span>(20 reviews)</span></div>
+        <span class="pill">Top-rated Maven course</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 13. WHAT'S INSIDE -->
+<section class="slide vcenter">
+  <span class="eyebrow reveal">What's inside</span>
+  <h2 class="reveal">What you get.</h2>
+  <div class="nums stagger">
+    <div class="numcard"><div class="numbig"><span data-count="10">0</span><span class="u">+ hrs</span></div><div class="numlab">Of content</div></div>
+    <div class="numcard"><div class="numbig"><span data-count="50">0</span><span class="u">%+</span></div><div class="numlab">Interactive</div></div>
+    <div class="numcard"><div class="numbig"><span data-count="3">0</span></div><div class="numlab">Role-play sessions</div><div class="numctx">Real-time feedback</div></div>
+    <div class="numcard"><div class="numbig"><span data-count="10">0</span></div><div class="numlab">Students / cohort</div><div class="numctx">Mutual learning &amp; networking</div></div>
+    <div class="numcard"><div class="numbig"><span data-count="3">0</span></div><div class="numlab">Live office hours</div></div>
+    <div class="numcard"><div class="numbig">5.0</div><div class="numlab">Rating</div><div class="numctx">Top-rated Maven course</div></div>
+    <div class="numcard wide"><div class="numbig"><span data-count="30">0</span><span class="u"> min</span></div><div class="numlab">Free private coaching session with Mengxi</div></div>
+  </div>
+</section>
+
+<!-- 14. QUADRUPLE LENS -->
+<section class="slide vcenter">
+  <span class="eyebrow reveal">Role-play simulation</span>
+  <h2 class="reveal">Practice "talking the talk" — with guardrails.</h2>
+  <p class="lead reveal">Real-life scenarios and real-time feedback, seen through a quadruple lens.</p>
+  <div class="grid g4 stagger">
+    <div class="card"><span class="cardic float">🎯</span><h3>Director lens</h3><p>Lead and influence above your level.</p></div>
+    <div class="card"><span class="cardic">🌐</span><h3>Non-native speaker</h3><p>Communicate with clarity and authority.</p></div>
+    <div class="card"><span class="cardic">♀</span><h3>Female lens</h3><p>Navigate the room on your own terms.</p></div>
+    <div class="card"><span class="cardic">🤝</span><h3>Manager &amp; report</h3><p>See both sides of the table.</p></div>
+  </div>
+</section>
+
+<!-- 15. IMMEDIATE IMPACT -->
+<section class="slide vcenter">
+  <div class="cols">
+    <div class="col-text reveal from-left">
+      <span class="eyebrow">Immediate impact</span>
+      <h2 style="font-size:clamp(2rem,3.6vw,3rem)">Alumni from leading teams.</h2>
+      <div class="alumni" style="margin-top:1.6rem">
+        <span class="chip">Amazon</span><span class="chip">Meta</span><span class="chip">Google</span><span class="chip">Bloomberg</span><span class="chip">Intuit</span><span class="chip">PayPal</span><span class="chip">Abbott</span><span class="chip">Apple</span><span class="chip">Scotiabank</span><span class="chip">Zillow</span><span class="chip">Merck</span><span class="chip">McKinsey</span><span class="chip">Stripe</span><span class="chip">Oracle</span><span class="chip">Gartner</span>
+      </div>
+    </div>
+    <div class="col-media reveal from-right">
+      <div class="tcard">
+        <div class="tstars">★★★★★</div>
+        <blockquote>"It reshaped how I approach managing up and influencing without authority — clarity, alignment, and intention over formal power. I walked away with practical tools I can apply immediately."</blockquote>
+        <div class="tby">Lauren <span>· Senior Data Scientist, Microsoft</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 16. LIVE POLL -->
+<section class="slide vcenter" id="live-poll">
+  <span class="eyebrow reveal">Live poll<span class="live-dot"></span>LIVE</span>
+  <h2 class="reveal" id="poll-q">Ever been given conflicting directions — boss, skip, stakeholders — and felt stuck in between?</h2>
+  <p class="lead reveal" id="poll-sub">Vote with the link I shared — results update here in real time.</p>
+  <div class="poll reveal" id="poll-bars"></div>
+  <div class="poll-foot reveal"><b id="poll-total">0</b> responses · refreshes automatically</div>
+</section>
+
+<!-- 17. CLOSING / CTA -->
+<section class="slide cover closing">
+  <div class="aura"></div>
+  <div class="inner">
+    <span class="eyebrow reveal">Upcoming cohorts</span>
+    <h1 class="reveal from-blur">Let's <span class="circle-word">talk<svg class="circle-mark" viewBox="0 0 400 130" preserveAspectRatio="none" aria-hidden="true"><path d="M 364 32 C 286 4, 78 6, 22 34 C -22 60, -4 104, 92 118 C 240 134, 380 118, 392 80 C 402 48, 386 38, 364 32"/></svg></span>.</h1>
+    <div class="cohorts reveal" style="margin-top:clamp(1.6rem,3vh,2.4rem)">
+      <div class="cohort"><div class="cd">Jan 7–9</div><div class="cn">Cohort 1 · 10 seats</div></div>
+      <div class="cohort"><div class="cd">Jan 13–15</div><div class="cn">Cohort 2 · 10 seats</div></div>
+    </div>
+    <a class="cta reveal" href="mailto:limengxi@executivelens.store">Enroll or bring your questions →</a>
+  </div>
+</section>
+
+<script>
+class SlidePresentation {
+    constructor(){ this.slides=document.querySelectorAll('.slide'); this.currentSlide=0; this.totalSlides=this.slides.length;
+        this.setupObserver(); this.setupKeyboard(); this.setupProgress(); this.setupDots(); }
+    setupObserver(){
+        const o=new IntersectionObserver((es)=>{ es.forEach(e=>{ e.target.classList.toggle('visible',e.isIntersecting);
+            if(e.isIntersecting){ this.currentSlide=[...this.slides].indexOf(e.target); this.updateProgress(); this.updateDots(); this.countUp(e.target);} }); },{threshold:0.5});
+        this.slides.forEach(s=>o.observe(s)); }
+    countUp(slide){ slide.querySelectorAll('[data-count]').forEach(el=>{ if(el.dataset.done) return; el.dataset.done='1';
+        const end=parseFloat(el.dataset.count),dur=1100,t0=performance.now(),suffix=el.dataset.suffix||'';
+        (function tick(now){ const p=Math.min(1,(now-t0)/dur),k=1-Math.pow(1-p,3);
+            el.textContent=Math.round(end*k).toLocaleString()+suffix; if(p<1) requestAnimationFrame(tick); })(t0); }); }
+    setupKeyboard(){ document.addEventListener('keydown',(e)=>{
+        if(e.key==='ArrowRight'||e.key==='ArrowDown'||e.key===' '){ e.preventDefault(); this.goTo(this.currentSlide+1);}
+        else if(e.key==='ArrowLeft'||e.key==='ArrowUp'){ e.preventDefault(); this.goTo(this.currentSlide-1);} }); }
+    goTo(i){ if(i>=0&&i<this.totalSlides) this.slides[i].scrollIntoView({behavior:'smooth'}); }
+    setupProgress(){ const b=document.createElement('div'); b.className='progress-bar';
+        b.style.cssText='position:fixed;top:0;left:0;height:3px;background:var(--accent);z-index:100;transition:width .3s ease;';
+        document.body.prepend(b); this.progressBar=b; }
+    updateProgress(){ this.progressBar.style.width=(((this.currentSlide+1)/this.totalSlides)*100)+'%'; }
+    setupDots(){ const n=document.createElement('nav'); n.className='nav-dots';
+        n.style.cssText='position:fixed;right:1.5rem;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:.5rem;z-index:100;';
+        this.slides.forEach((_,i)=>{ const d=document.createElement('button');
+            d.style.cssText='width:8px;height:8px;border-radius:50%;border:none;background:var(--text-secondary);opacity:.4;cursor:pointer;transition:all .3s;padding:0;';
+            d.addEventListener('click',()=>this.goTo(i)); n.appendChild(d); });
+        document.body.appendChild(n); this.dots=n.querySelectorAll('button'); }
+    updateDots(){ this.dots.forEach((d,i)=>{ d.style.opacity=i===this.currentSlide?'1':'.4';
+        d.style.background=i===this.currentSlide?'var(--text-primary)':'var(--text-secondary)'; }); }
+}
+document.addEventListener('DOMContentLoaded',()=>new SlidePresentation());
+</script>
+
+<script>
+/* ===== Live poll: Google Sheet → real-time bar chart =====
+   GO LIVE IN 4 STEPS:
+   1) Build a Google Form; link it to a Google Sheet (responses land in a tab, e.g. "Form Responses 1").
+   2) Share the Sheet: "Anyone with the link → Viewer".
+   3) Below: set demo:false, paste sheetId (in the sheet URL between /d/ and /edit),
+      set sheetName to the response tab, and list options EXACTLY as they appear in the cells.
+   4) Host this file on GitHub Pages and share that link.
+   No backend — the page polls the sheet every few seconds.
+   If gviz is ever blocked by CORS on your host, swap the URL in fetchLive() for the free
+   proxy:  https://opensheet.elk.sh/<sheetId>/<sheetName>  (returns clean JSON array). */
+const LIVE_POLL = {
+  demo: false,                 // set true (or add ?demo=1 to the URL) to preview with fake data
+  options: [],                 // [] = auto-detect choices from the sheet; or pin them: ['Yes','No']
+  intervalMs: 7000,
+  sheetId: '1-wBFxQlgACSh6WjOw00HrS-YtJqDTMj2d7knQloymaA',
+  gid: '155191099',            // the response tab's gid (from the sheet URL)
+  sheetName: 'Form Responses 1',
+  answerHeader: ''             // exact column header to chart; '' = last column
+};
+
+(function(){
+  const wrap = document.getElementById('poll-bars');
+  const totalEl = document.getElementById('poll-total');
+  if(!wrap) return;
+  const demo = LIVE_POLL.demo || /[?&]demo\b/.test(location.search);
+  const fixed = (LIVE_POLL.options || []).slice();
+  const demoOpts = ['Yes','No','Not sure'];
+  let counts = {};
+  fixed.forEach(o => counts[o] = 0);
+
+  const rows = {};
+  function ensureRow(opt){
+    if(rows[opt]) return rows[opt];
+    const row = document.createElement('div'); row.className = 'poll-row'; row.dataset.opt = opt;
+    row.innerHTML =
+      '<div class="poll-head"><span class="poll-opt"></span>' +
+      '<span class="poll-pct"><span class="p">0%</span><span class="n">0</span></span></div>' +
+      '<div class="poll-track"><div class="poll-fill"></div></div>';
+    row.querySelector('.poll-opt').textContent = opt;
+    wrap.appendChild(row); rows[opt] = row; return row;
+  }
+  fixed.forEach(ensureRow);
+
+  let waitEl = null;
+  function setWaiting(on){
+    if(on && !waitEl){ waitEl = document.createElement('div'); waitEl.className = 'poll-wait';
+      waitEl.textContent = 'Waiting for the first responses…'; wrap.appendChild(waitEl); }
+    else if(!on && waitEl){ waitEl.remove(); waitEl = null; }
+  }
+
+  function render(){
+    const keys = Object.keys(counts);
+    const total = keys.reduce((a,k)=>a+counts[k],0);
+    totalEl.textContent = total.toLocaleString();
+    setWaiting(total === 0 && fixed.length === 0);
+    const order = fixed.length ? fixed.slice() : keys.slice().sort((a,b)=>counts[b]-counts[a]);
+    order.forEach(opt => {
+      const row = ensureRow(opt); wrap.appendChild(row);
+      const c = counts[opt] || 0, pct = total ? Math.round(c/total*100) : 0;
+      row.querySelector('.poll-fill').style.width = pct + '%';
+      row.querySelector('.p').textContent = pct + '%';
+      row.querySelector('.n').textContent = c.toLocaleString();
+    });
+  }
+
+  async function fetchLive(){
+    const q = LIVE_POLL.gid ? ('gid=' + encodeURIComponent(LIVE_POLL.gid))
+                            : ('sheet=' + encodeURIComponent(LIVE_POLL.sheetName || ''));
+    const url = 'https://docs.google.com/spreadsheets/d/' + LIVE_POLL.sheetId +
+                '/gviz/tq?tqx=out:json&headers=1&' + q;
+    const txt = await (await fetch(url, {cache:'no-store'})).text();
+    if(txt.indexOf('google.visualization') < 0) throw new Error('sheet not public yet');
+    const json = JSON.parse(txt.substring(txt.indexOf('(')+1, txt.lastIndexOf(')')));
+    const cols = (json.table.cols||[]).map(c => (c.label||'').trim());
+    let idx = LIVE_POLL.answerHeader ? cols.indexOf(LIVE_POLL.answerHeader) : cols.length-1;
+    if(idx < 0) idx = cols.length-1;
+    const next = {}; fixed.forEach(o => next[o] = 0);
+    (json.table.rows||[]).forEach(r => {
+      const cell = r.c && r.c[idx];
+      const v = cell && cell.v != null ? String(cell.v).trim() : '';
+      if(!v) return;
+      if(fixed.length){ if(v in next) next[v]++; }
+      else next[v] = (next[v]||0) + 1;
+    });
+    counts = next;
+  }
+
+  function demoTick(){
+    const o = fixed.length ? fixed : demoOpts;
+    o.forEach(x => { if(!(x in counts)) counts[x] = 0; });
+    const n = 1 + Math.floor(Math.random()*4);
+    for(let i=0;i<n;i++){
+      const r = Math.random();
+      const opt = r < 0.55 ? o[0] : (r < 0.85 ? (o[1]||o[0]) : (o[2]||o[1]||o[0]));
+      counts[opt] = (counts[opt]||0) + 1;
+    }
+  }
+
+  async function tick(){
+    try{ demo ? demoTick() : await fetchLive(); render(); }
+    catch(e){ render(); }
+  }
+  tick();
+  setInterval(tick, LIVE_POLL.intervalMs);
+})();
+</script>
+</body>
+</html>
